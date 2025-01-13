@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Product struct {
@@ -53,5 +54,14 @@ func main() {
 	}
 
 	db.AutoMigrate(&Product{}, &Category{}, &SerialNumber{})
-
+	// Lock pessimista
+	tx := db.Begin()
+	var c Category
+	err = tx.Debug().Clauses().Clauses(clause.Locking{Strength: "UPDATE"}).First(&c, 1).Error
+	if err != nil {
+		panic(err)
+	}
+	c.CategoryName = "Bebidas"
+	tx.Debug().Save(&c)
+	tx.Commit()
 }
