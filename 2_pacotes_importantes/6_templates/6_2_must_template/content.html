@@ -1,0 +1,22 @@
+{{ template "header.html" . }}
+
+<h1>Courses</h1>
+<table style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr style="background-color: blue; color: white;">
+            <th style="border: 1px solid black; padding: 8px;">Course</th>
+            <th style="border: 1px solid black; padding: 8px;">Price</th>
+            <th style="border: 1px solid black; padding: 8px;">Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range $index, $course := .}}
+        <tr class="{{ if eq (mod $index 2 0) }}lightblue-row{{else}}white-row{{end}}">
+            <td style="border: 1px solid black; padding: 8px;">{{ $course.Name }}</td>
+            <td style="border: 1px solid black; padding: 8px;">{{ $course.Price }}</td>
+            <td style="border: 1px solid black; padding: 8px;">{{ $course.Duration }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ template "footer.html" . }}

@@ -1,0 +1,23 @@
+{{ template "header.html" . }}
+
+<h1>Courses</h1>
+<table style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Price</th>
+            <th>Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .}}
+        {{ if eq .Name "Go" }}
+        <tr>
+            <td>{{ .Name | ToUpper }}</td>
+            <td>{{ .Price }}</td>
+            <td>{{ .Duration }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ template "footer.html" . }}
