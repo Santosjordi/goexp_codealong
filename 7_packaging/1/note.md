@@ -1,0 +1,1 @@
+It's good practice to nae the packages with the template of  github.com/santosjordi/package-name so it makes it easier to distribute it later.
