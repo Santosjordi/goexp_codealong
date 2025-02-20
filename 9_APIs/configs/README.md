@@ -1,0 +1,1 @@
+This folder stores files to configure booting options for the app;
