@@ -49,7 +49,7 @@ func (p *Product) Update(product *entity.Product) error {
 	if err != nil {
 		return err
 	}
-	return p.DB.Save(product).Error
+	return p.DB.Model(&entity.Product{}).Where("product_id = ?", product.ProductID.String()).Updates(product).Error
 }
 
 func (p *Product) Delete(productID string) error {
@@ -57,5 +57,5 @@ func (p *Product) Delete(productID string) error {
 	if err != nil {
 		return err
 	}
-	return p.DB.Delete(product).Error
+	return p.DB.Model(&entity.Product{}).Where("product_id = ?", product.ProductID.String()).Delete(product).Error
 }

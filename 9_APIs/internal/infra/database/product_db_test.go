@@ -75,3 +75,90 @@ func TestFindAllProducts(t *testing.T) {
 	assert.Equal(t, "Product 33", products_pg_three[3].Name)
 
 }
+
+func TestFindProductByID(t *testing.T) {
+	// arrange
+	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+	if err != nil {
+		t.Error(err)
+	}
+	db.AutoMigrate(&entity.Product{})
+
+	product, err := entity.NewProduct("Product 1", 10.0)
+	assert.Nil(t, err)
+	db.Create(product)
+
+	productDB := NewProduct(db)
+
+	// act
+	productFound, err := productDB.FindByID(product.ProductID.String())
+
+	// assert
+	assert.Nil(t, err)
+	assert.Equal(t, product.Name, productFound.Name)
+	assert.Equal(t, product.Price, productFound.Price)
+}
+
+func TestUpdateProduct(t *testing.T) {
+	// arrange
+	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+	if err != nil {
+		t.Error(err)
+	}
+	db.AutoMigrate(&entity.Product{})
+
+	product, err := entity.NewProduct("Product 1", 10.0)
+	assert.Nil(t, err)
+	db.Create(product)
+
+	productDB := NewProduct(db)
+
+	// assert that there is only one product in the database
+	var count int64
+	db.Model(&entity.Product{}).Count(&count)
+	assert.Equal(t, int64(1), count)
+
+	// act
+	product.Name = "Product 2"
+	product.Price = 20.0
+	err = productDB.Update(product)
+	assert.Nil(t, err)
+	productFound, err := productDB.FindByID(product.ProductID.String())
+
+	// assert
+	assert.Nil(t, err)
+	assert.Equal(t, product.Name, productFound.Name)
+	assert.Equal(t, product.Price, productFound.Price)
+	// assert that there is still only one product in the database
+	db.Model(&entity.Product{}).Count(&count)
+	assert.Equal(t, int64(1), count)
+}
+
+func TestDeleteProduct(t *testing.T) {
+	// arrange
+	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+	if err != nil {
+		t.Error(err)
+	}
+	db.AutoMigrate(&entity.Product{})
+
+	product, err := entity.NewProduct("Product 1", 10.0)
+	assert.Nil(t, err)
+	db.Create(product)
+
+	productDB := NewProduct(db)
+
+	// assert that there is only one product in the database
+	var count int64
+	db.Model(&entity.Product{}).Count(&count)
+	assert.Equal(t, int64(1), count)
+
+	// act
+	err = productDB.Delete(product.ProductID.String())
+
+	// assert
+	assert.Nil(t, err)
+	// assert that there are no products in the database
+	db.Model(&entity.Product{}).Count(&count)
+	assert.Equal(t, int64(0), count)
+}
