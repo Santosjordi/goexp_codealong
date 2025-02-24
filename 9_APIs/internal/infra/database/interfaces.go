@@ -7,10 +7,10 @@ type UserInterface interface {
 	FindByEmail(email string) (*entity.User, error)
 }
 
-type ProdcutInterface interface {
-	Create(product *entity.Product) (*entity.Product, error)
+type ProductInterface interface {
+	Create(product *entity.Product) error
 	FindAll(page, limit int, sort string) ([]entity.Product, error)
 	FindByID(productID string) (*entity.Product, error)
-	Update(product *entity.Product) (*entity.Product, error)
+	Update(product *entity.Product) error
 	Delete(productID string) error
 }

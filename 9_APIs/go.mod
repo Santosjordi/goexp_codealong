@@ -6,6 +6,7 @@ require github.com/spf13/viper v1.19.0
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/go-chi/chi/v5 v5.2.1 // indirect
 	github.com/goccy/go-json v0.3.5 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -22,6 +23,7 @@ require (
 
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/jwtauth v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/hcl v1.0.0 // indirect
