@@ -15,11 +15,11 @@ func NewUser(db *gorm.DB) *User {
 	}
 }
 
-func (u *User) Create(user *entity.User) (*entity.User, error) {
+func (u *User) Create(user *entity.User) error {
 	if err := u.DB.Create(user).Error; err != nil {
-		return nil, err
+		return err
 	}
-	return user, nil
+	return nil
 }
 
 func (u *User) FindByEmail(email string) (*entity.User, error) {
