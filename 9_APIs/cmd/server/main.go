@@ -1,10 +1,11 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/jwtauth"
 	"github.com/santosjordi/posgoexp/9_apis/configs"
 	"github.com/santosjordi/posgoexp/9_apis/internal/entity"
 	"github.com/santosjordi/posgoexp/9_apis/internal/infra/database"
@@ -33,17 +34,33 @@ func main() {
 	userHandler := handlers.NewUserHandler(userDB, config.TokenAuth, config.JwtExpiresIn)
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	// r.Use(middleware.Logger)
+	// custom middleware
+	r.Use(LogRequest)
 
-	r.Post("/products", productHandler.CreateProduct)
-	r.Put("/products/{id}", productHandler.UpdateProduct)
-	r.Get("/products/{id}", productHandler.GetProduct)
-	r.Get("/products", productHandler.GetProducts)
-	r.Delete("/products/{id}", productHandler.DeleteProduct)
+	r.Route("/products", func(r chi.Router) {
+		r.Use(jwtauth.Verifier(config.TokenAuth))
+		r.Use(jwtauth.Authenticator)
+		r.Post("/", productHandler.CreateProduct)
+
+		r.Put("/{id}", productHandler.UpdateProduct)
+
+		r.Get("/", productHandler.GetProducts)
+		r.Get("/{id}", productHandler.GetProduct)
+
+		r.Delete("/{id}", productHandler.DeleteProduct)
+	})
 
 	r.Post("/users", userHandler.CreateUser)
 	r.Post("/users/generate-jwt", userHandler.GetJwt)
 	r.Get("/users/{email}", userHandler.FindUserByEmail)
 
 	http.ListenAndServe(config.WebServerPort, r)
+}
+
+func LogRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
 }

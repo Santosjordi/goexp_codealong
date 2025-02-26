@@ -39,7 +39,7 @@ func (h *UserHandler) GetJwt(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	if !foundUser.ValidatePassword(foundUser.Password) {
+	if !foundUser.ValidatePassword(user.Password) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
