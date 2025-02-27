@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
 	"github.com/santosjordi/posgoexp/9_apis/configs"
 	"github.com/santosjordi/posgoexp/9_apis/internal/entity"
@@ -31,12 +32,14 @@ func main() {
 
 	// handler receives the repo, the repo needs to have all interface methods implemented
 	productHandler := handlers.NewProductHandler(productDB)
-	userHandler := handlers.NewUserHandler(userDB, config.TokenAuth, config.JwtExpiresIn)
+	userHandler := handlers.NewUserHandler(userDB)
 
 	r := chi.NewRouter()
-	// r.Use(middleware.Logger)
+	r.Use(middleware.Logger)
 	// custom middleware
-	r.Use(LogRequest)
+	// r.Use(LogRequest)
+	r.Use(middleware.WithValue("jwt", config.TokenAuth))
+	r.Use(middleware.WithValue("jwtExpiresIn", config.JwtExpiresIn))
 
 	r.Route("/products", func(r chi.Router) {
 		r.Use(jwtauth.Verifier(config.TokenAuth))
