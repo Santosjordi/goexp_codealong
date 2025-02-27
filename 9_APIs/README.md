@@ -41,6 +41,7 @@ This repository is a Golang REST API structured following the [golang-standards/
 - [Golang](https://go.dev/dl/) 1.21+
 - [Docker](https://www.docker.com/) (optional for containerized deployment)
 - [Make](https://www.gnu.org/software/make/) (optional for task automation)
+- [Swag](github.com/swaggo/swag) for documentation (binary is in the bin folder in the gopath)
 
 ### Installation
 
