@@ -8,12 +8,31 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
 	"github.com/santosjordi/posgoexp/9_apis/configs"
+	_ "github.com/santosjordi/posgoexp/9_apis/docs"
 	"github.com/santosjordi/posgoexp/9_apis/internal/entity"
 	"github.com/santosjordi/posgoexp/9_apis/internal/infra/database"
 	"github.com/santosjordi/posgoexp/9_apis/internal/webserver/handlers"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
+// @title Fullcycle Goexpert
+// @version 1.0
+// @description This is a practice server for the Fullcycle Golang Course.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name Jordi
+
+// @license.name FCL
+// @license.URL http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8000
+// @BasePath /
+// @securityDefinitions.apiKey ApiKeyAuth
+// @in header
+// @name Authorization
+// @tokenUrl http://localhost:8000/users/generate-jwt
 
 func main() {
 	config, err := configs.LoadConfig(".")
@@ -57,6 +76,8 @@ func main() {
 	r.Post("/users", userHandler.CreateUser)
 	r.Post("/users/generate-jwt", userHandler.GetJwt)
 	r.Get("/users/{email}", userHandler.FindUserByEmail)
+
+	r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8000/docs/doc.json")))
 
 	http.ListenAndServe(config.WebServerPort, r)
 }
