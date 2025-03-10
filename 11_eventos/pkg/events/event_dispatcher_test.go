@@ -1,6 +1,7 @@
 package events
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -30,7 +31,7 @@ type TestEventHandler struct {
 	ID int
 }
 
-func (h *TestEventHandler) Handle(event EventInterface) {}
+func (h *TestEventHandler) Handle(event EventInterface, wg *sync.WaitGroup) {}
 
 type EventDispatcherTestSuite struct {
 	suite.Suite
@@ -133,17 +134,45 @@ type MockHandler struct {
 	mock.Mock
 }
 
-func (m *MockHandler) Handle(event EventInterface) {
+// Handle is a mock implementation of the Handle method for the MockHandler.
+//
+// It simulates handling an event and marks the WaitGroup as done.
+//
+// Parameters:
+//
+// - event: The event to be handled.
+//
+// - wg: The WaitGroup to be marked as done after handling the event.
+func (m *MockHandler) Handle(event EventInterface, wg *sync.WaitGroup) {
 	m.Called(event)
+	wg.Done()
 }
 
+// TestEventDispatch_Dispatch tests the Dispatch method of the EventDispatcher.
+// It verifies that the Dispatch method correctly triggers the Handle method on all registered handlers for a specific event.
+//
+// The test uses a MockHandler to simulate the event handler and ensure that the Handle method is called exactly once.
+//
+// Steps:
+// 1. Create a MockHandler instance.
+// 2. Register the MockHandler for a specific event.
+// 3. Dispatch the event using the EventDispatcher.
+// 4. Assert that the Handle method was called exactly once with the correct event.
 func (suite *EventDispatcherTestSuite) TestEventDispatch_Dispatch() {
 	eh := &MockHandler{}
 	eh.On("Handle", &suite.event)
+
+	eh2 := &MockHandler{}
+	eh2.On("Handle", &suite.event)
+
 	suite.eventDispatcher.Register(suite.event.GetName(), eh)
+	suite.eventDispatcher.Register(suite.event.GetName(), eh2)
+
 	suite.eventDispatcher.Dispatch(&suite.event)
 	eh.AssertExpectations(suite.T())
+	eh2.AssertExpectations(suite.T())
 	eh.AssertNumberOfCalls(suite.T(), "Handle", 1)
+	eh2.AssertNumberOfCalls(suite.T(), "Handle", 1)
 }
 
 func TestSuite(t *testing.T) {
