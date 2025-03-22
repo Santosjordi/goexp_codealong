@@ -26,3 +26,6 @@ go.work.sum
 
 # mysql container files
 **/mysql/*
+
+# vendor folder for downloaded libs
+vendor
