@@ -29,3 +29,7 @@ go.work.sum
 
 # vendor folder for downloaded libs
 vendor
+
+# IDE stuff
+.idea
+.idea/*
