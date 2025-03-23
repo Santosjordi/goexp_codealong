@@ -52,3 +52,21 @@ func (c *Category) FindAll() ([]Category, error) {
 	log.Printf("Retrieved Categories: %+v\n", categories)
 	return categories, nil
 }
+
+// Given a courseID, find the category associated with it
+func (c *Category) FindByCourseID(courseID string) (Category, error) {
+	var id, name, description string
+	err := c.db.QueryRow(`
+        SELECT c.id, c.name, c.description 
+        FROM categories c 
+        JOIN courses co ON c.id = co.category_id 
+        WHERE co.id = ?`, courseID).Scan(&id, &name, &description)
+
+	if err != nil {
+		log.Printf("Error finding category for courseID %s: %v", courseID, err)
+		return Category{}, err
+	}
+
+	log.Printf("Found Category: ID=%s, Name=%s, Description=%s", id, name, description)
+	return Category{ID: id, Name: name, Description: description}, nil
+}
