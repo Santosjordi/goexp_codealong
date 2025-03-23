@@ -1,0 +1,36 @@
+@startuml dataflow_category
+participant "Client" as client
+participant "GraphQL Server" as gql
+participant "MutationResolver" as resolver
+participant "CategoryDB" as db
+
+client -> gql: mutation createCategory(input: NewCategory)
+activate gql
+
+gql -> resolver: CreateCategory(ctx, input)
+activate resolver
+
+note right of resolver
+    Potential error point:
+    Dereferencing nullable Description
+    with *input.Description
+end note
+
+resolver -> db: CreateCategory(name, description)
+activate db
+
+alt Success Case
+    db --> resolver: category, nil
+    resolver --> gql: mapped Category model, nil
+    gql --> client: { category: { ... } }
+else Error Case
+    db --> resolver: nil, error
+    resolver --> gql: nil, error
+    gql --> client: { errors: [...] }
+end
+
+deactivate db
+deactivate resolver
+deactivate gql
+
+@endum

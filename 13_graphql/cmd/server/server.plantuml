@@ -1,0 +1,42 @@
+@startuml GraphQL Server Initialization and Request Flow
+
+participant "Main" as main
+participant "Database" as db
+participant "CategoryDB" as categorydb
+participant "GraphQL Server" as server
+participant "HTTP Server" as http
+participant "Client" as client
+
+== Server Initialization ==
+main -> db: sql.Open("sqlite3", "./data.db")
+activate db
+db --> main: db connection
+main -> categorydb: NewCategory(db)
+activate categorydb
+categorydb --> main: categoryDB instance
+
+main -> server: handler.New(NewExecutableSchema())
+activate server
+note right of server
+    Configures:
+    - Resolvers
+    - Transports (GET/POST/OPTIONS)
+    - Query Cache
+    - Extensions
+end note
+
+main -> http: Handle("/", playground)
+main -> http: Handle("/query", srv)
+activate http
+
+== Request Handling ==
+client -> http: HTTP Request
+http -> server: Forward Request
+server -> categorydb: Database Operation
+categorydb -> db: SQL Query
+db --> categorydb: Result
+categorydb --> server: Data
+server --> http: GraphQL Response
+http --> client: HTTP Response
+
+@enduml
