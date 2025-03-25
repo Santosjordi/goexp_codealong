@@ -70,3 +70,14 @@ func (c *Category) FindByCourseID(courseID string) (Category, error) {
 	log.Printf("Found Category: ID=%s, Name=%s, Description=%s", id, name, description)
 	return Category{ID: id, Name: name, Description: description}, nil
 }
+
+func (c *Category) Find(id string) (Category, error) {
+	var name, description string
+	err := c.db.QueryRow("SELECT name, description FROM categories WHERE id = $1", id).Scan(&name, &description)
+	if err != nil {
+		return Category{}, err
+	}
+	category := Category{ID: id, Name: name, Description: description}
+	log.Printf("Found Category: %+v\n", category)
+	return category, nil
+}
