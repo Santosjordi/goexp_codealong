@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"io"
 
 	"github.com/santosjordi/posgoexp/14_grpc/internal/database"
 	"github.com/santosjordi/posgoexp/14_grpc/internal/pb"
+	"google.golang.org/grpc"
 )
 
 type CategoryService struct {
@@ -58,4 +60,30 @@ func (c *CategoryService) GetCategory(ctx context.Context, in *pb.GetCategoryReq
 		Description: category.Description,
 	}
 	return categoryResponse, nil
+}
+
+func (c *CategoryService) CreateCategoryStream(stream grpc.ClientStreamingServer[pb.CreateCategoryRequest, pb.CategoryList]) error {
+	categories := &pb.CategoryList{}
+
+	for {
+		category, err := stream.Recv()
+		if err == io.EOF {
+			// Once the client is done sending, return the full list.
+			return stream.SendAndClose(categories)
+		}
+		if err != nil {
+			return err
+		}
+
+		categoryResult, err := c.CategoryDB.CreateCategory(category.Name, category.Description)
+		if err != nil {
+			return err
+		}
+
+		categories.Categories = append(categories.Categories, &pb.Category{
+			Id:          categoryResult.ID,
+			Name:        categoryResult.Name,
+			Description: categoryResult.Description,
+		})
+	}
 }

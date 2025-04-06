@@ -1,0 +1,29 @@
+@startuml
+
+package "gRPC Client" {
+    component Client
+}
+
+package "gRPC Server" {
+    component Server
+    component "Service Implementation" as ServiceImpl
+    interface "Generated gRPC Service" as Service
+}
+
+package "Protocol Buffers" {
+    file "service.proto" as Proto
+}
+
+package "gRPC Framework" {
+    interface "gRPC Runtime" as GRPCRuntime
+}
+
+Client --> Service : Calls RPC
+Service --> ServiceImpl : Handles request
+ServiceImpl --> GRPCRuntime : Uses gRPC framework
+Server --> GRPCRuntime : Runs on gRPC framework
+Proto --> Service : Defines service contract
+Proto --> Client : Generates client stubs
+Proto --> Server : Generates server code
+
+@enduml
