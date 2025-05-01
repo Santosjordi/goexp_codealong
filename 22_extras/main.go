@@ -14,10 +14,23 @@ import (
 func main() {
 	server := &http.Server{Addr: ":3000"}
 
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered from panic:", r)
+		}
+	}()
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Hello, World!"))
+	})
+
+	http.HandleFunc("/panic", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		// Simulate a panic
+		mockPanic()
 	})
 
 	go func() {
@@ -41,4 +54,10 @@ func main() {
 
 	fmt.Println("Server stopped")
 
+}
+
+func mockPanic() {
+	// This function is intentionally left empty to simulate a panic.
+	// In a real-world scenario, this would be replaced with actual code that could cause a panic.
+	panic("This is a simulated panic")
 }
