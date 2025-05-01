@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM golang:latest as builder
 WORKDIR /app
 COPY . .
 
@@ -6,6 +6,10 @@ COPY . .
 # This reduces the size of the binary and makes it more secure
 # The -w flag removes the DWARF symbol table and debug information
 # The -s flag omits the symbol table and debug information
-RUN GOOS=linux go build -ldflags="-w -s" -o server .
+# building from scratch we need to set CGO_ENABLED=0
+# CGO_ENABLED=0 disables cgo, which is necessary for building a statically linked binary
+RUN GOOS=linux CGO_ENABLED=0 go build -ldflags="-w -s" -o server .
 
-CMD ["./server"]
+FROM scratch
+COPY --from=builder /app/server .
+CMD ["/server"]
