@@ -1,0 +1,11 @@
+FROM golang:latest
+WORKDIR /app
+COPY . .
+
+# compile the binary without the debug information and other symbols
+# This reduces the size of the binary and makes it more secure
+# The -w flag removes the DWARF symbol table and debug information
+# The -s flag omits the symbol table and debug information
+RUN GOOS=linux go build -ldflags="-w -s" -o server .
+
+CMD ["./server"]
